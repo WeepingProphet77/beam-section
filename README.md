@@ -45,6 +45,13 @@ npm run build
 npm run preview
 ```
 
+## Deployment
+
+This application is deployed on GitHub Pages and available at:  
+**[https://weepingprophet77.github.io/beam-section/](https://weepingprophet77.github.io/beam-section/)**
+
+The deployment is automated via GitHub Actions. Any push to the `main` branch triggers a new build and deployment.
+
 ## Usage
 
 1. **Enter Section Geometry**:
