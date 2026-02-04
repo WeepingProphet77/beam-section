@@ -1,0 +1,102 @@
+.beam-visualization {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8e8e8;
+}
+
+.beam-visualization h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a365d;
+}
+
+.beam-svg {
+  display: block;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #fafafa 0%, #f0f4f8 100%);
+  border-radius: 8px;
+}
+
+.dimension-text {
+  font-size: 11px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  fill: #4a5568;
+  text-anchor: middle;
+  font-weight: 500;
+}
+
+.dimension-text.small {
+  font-size: 10px;
+}
+
+.dimension-text.vertical {
+  text-anchor: middle;
+}
+
+.dimension-text.na-label {
+  text-anchor: start;
+  fill: #805ad5;
+  font-weight: 600;
+}
+
+.dimension-text.stress-label {
+  fill: #e53e3e;
+  font-weight: 500;
+}
+
+.legend-title {
+  font-size: 10px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  fill: #718096;
+  font-weight: 600;
+}
+
+.legend-text {
+  font-size: 9px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  fill: #4a5568;
+}
+
+.strain-diagram {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.strain-diagram h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a365d;
+  text-align: center;
+}
+
+.strain-svg {
+  display: block;
+  margin: 0 auto;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.strain-label {
+  font-size: 9px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  fill: #4a5568;
+}
+
+/* Animation for stress block */
+.beam-svg rect[fill="url(#stressBlockGradient)"] {
+  animation: pulseStress 2s ease-in-out infinite;
+}
+
+@keyframes pulseStress {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
