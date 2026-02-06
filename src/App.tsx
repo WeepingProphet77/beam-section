@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { InputForm } from './components/InputForm';
 import { BeamVisualization } from './components/BeamVisualization';
 import { ResultsDisplay } from './components/ResultsDisplay';
+import { ExportModal } from './components/ExportModal';
 import type { BeamInput, BeamResults } from './types/beam';
 import { DEFAULT_BEAM_INPUT } from './types/beam';
 import { analyzeBeam } from './utils/beamCalculations';
@@ -10,6 +11,7 @@ import './App.css';
 function App() {
   const [input, setInput] = useState<BeamInput>(DEFAULT_BEAM_INPUT);
   const [results, setResults] = useState<BeamResults | null>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Calculate results whenever input changes
   useEffect(() => {
@@ -42,9 +44,20 @@ function App() {
               <span className="subtitle">ACI 318-19 Flexural Analysis</span>
             </div>
           </div>
-          <div className="header-info">
-            <span className="badge">Reinforced Concrete</span>
-            <span className="badge">US Customary Units</span>
+          <div className="header-actions">
+            <div className="header-info">
+              <span className="badge">Reinforced Concrete</span>
+              <span className="badge">US Customary Units</span>
+            </div>
+            <button
+              className="export-btn"
+              onClick={() => setIsExportModalOpen(true)}
+              disabled={!results}
+              title={results ? 'Export calculation sheet to PDF' : 'Enter valid parameters to enable export'}
+            >
+              <span className="export-icon">&#128196;</span>
+              Export PDF
+            </button>
           </div>
         </div>
       </header>
@@ -84,6 +97,16 @@ function App() {
           </p>
         </div>
       </footer>
+
+      {/* Export Modal */}
+      {results && (
+        <ExportModal
+          isOpen={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          input={input}
+          results={results}
+        />
+      )}
     </div>
   );
 }
