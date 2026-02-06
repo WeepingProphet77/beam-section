@@ -8,7 +8,9 @@ const PAGE_HEIGHT = 279.4;
 const MARGIN_LEFT = 20;
 const MARGIN_RIGHT = 20;
 const MARGIN_TOP = 20;
+const MARGIN_BOTTOM = 28; // Space for footer
 const CONTENT_WIDTH = PAGE_WIDTH - MARGIN_LEFT - MARGIN_RIGHT;
+const MAX_Y = PAGE_HEIGHT - MARGIN_BOTTOM; // Maximum Y position before footer
 
 // Colors
 const PRIMARY_COLOR: [number, number, number] = [26, 54, 93]; // Dark blue
@@ -23,6 +25,21 @@ interface PDFExportOptions {
   projectNumber?: string;
   engineer?: string;
   date?: string;
+}
+
+/**
+ * Check if content will fit on the current page, add new page if needed
+ * @param doc - jsPDF document
+ * @param y - current Y position
+ * @param neededHeight - height needed for upcoming content
+ * @returns new Y position (either unchanged or reset to top of new page)
+ */
+function checkPageBreak(doc: jsPDF, y: number, neededHeight: number): number {
+  if (y + neededHeight > MAX_Y) {
+    doc.addPage();
+    return MARGIN_TOP;
+  }
+  return y;
 }
 
 /**
@@ -56,36 +73,38 @@ export function generatePDF(
   y = drawMaterialProperties(doc, y, input, results);
 
   // === FLEXURAL ANALYSIS ===
+  // Check if we need a new page before this section (needs ~100mm)
+  if (y > MAX_Y - 100) {
+    doc.addPage();
+    y = MARGIN_TOP;
+  }
   y = drawSectionTitle(doc, y, 'FLEXURAL STRENGTH ANALYSIS');
   y = drawFlexuralAnalysis(doc, y, input, results);
 
-  // Check if we need a new page
-  if (y > PAGE_HEIGHT - 100) {
+  // === STRAIN COMPATIBILITY ===
+  // Check if we need a new page before this section (needs ~90mm)
+  if (y > MAX_Y - 90) {
     doc.addPage();
     y = MARGIN_TOP;
   }
-
-  // === STRAIN COMPATIBILITY ===
   y = drawSectionTitle(doc, y, 'STRAIN COMPATIBILITY CHECK');
   y = drawStrainAnalysis(doc, y, input, results);
 
-  // Check if we need a new page
-  if (y > PAGE_HEIGHT - 80) {
+  // === REINFORCEMENT LIMITS ===
+  // Check if we need a new page before this section (needs ~85mm)
+  if (y > MAX_Y - 85) {
     doc.addPage();
     y = MARGIN_TOP;
   }
-
-  // === REINFORCEMENT LIMITS ===
   y = drawSectionTitle(doc, y, 'REINFORCEMENT LIMITS CHECK');
   y = drawReinforcementLimits(doc, y, input, results);
 
-  // Check if we need a new page
-  if (y > PAGE_HEIGHT - 60) {
+  // === SUMMARY ===
+  // Check if we need a new page before this section (needs ~60mm)
+  if (y > MAX_Y - 60) {
     doc.addPage();
     y = MARGIN_TOP;
   }
-
-  // === SUMMARY ===
   y = drawSectionTitle(doc, y, 'DESIGN SUMMARY');
   y = drawSummary(doc, y, results);
 
@@ -285,7 +304,8 @@ function drawFlexuralAnalysis(
   doc.setTextColor(...PRIMARY_COLOR);
   doc.setFontSize(10);
 
-  // Step 1: Stress block depth
+  // Step 1: Stress block depth (needs ~35mm)
+  y = checkPageBreak(doc, y, 35);
   doc.setFont('helvetica', 'bold');
   doc.text('Step 1: Depth of Equivalent Stress Block, a', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -313,7 +333,9 @@ function drawFlexuralAnalysis(
 
   y += 30;
 
-  // Step 2: Neutral axis depth
+  // Step 2: Neutral axis depth (needs ~30mm)
+  y = checkPageBreak(doc, y, 30);
+  doc.setTextColor(...PRIMARY_COLOR);
   doc.setFont('helvetica', 'bold');
   doc.text('Step 2: Neutral Axis Depth, c', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -340,7 +362,9 @@ function drawFlexuralAnalysis(
 
   y += 24;
 
-  // Step 3: Nominal moment capacity
+  // Step 3: Nominal moment capacity (needs ~45mm)
+  y = checkPageBreak(doc, y, 45);
+  doc.setTextColor(...PRIMARY_COLOR);
   doc.setFont('helvetica', 'bold');
   doc.text('Step 3: Nominal Moment Capacity, Mn', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -382,7 +406,8 @@ function drawStrainAnalysis(
   doc.setTextColor(...PRIMARY_COLOR);
   doc.setFontSize(10);
 
-  // Tension steel strain
+  // Tension steel strain (needs ~30mm)
+  y = checkPageBreak(doc, y, 30);
   doc.setFont('helvetica', 'bold');
   doc.text('Tension Steel Strain, et', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -413,7 +438,9 @@ function drawStrainAnalysis(
   doc.text(`Steel Yield Strain: ey = fy / Es = ${input.fy.toLocaleString()} / ${(input.Es / 1000000).toFixed(0)} x 10^6 = ${formatNumber(results.epsilon_y, 5)}`, MARGIN_LEFT, y);
   y += 10;
 
-  // Section classification
+  // Section classification (needs ~45mm)
+  y = checkPageBreak(doc, y, 45);
+  doc.setTextColor(...PRIMARY_COLOR);
   doc.setFont('helvetica', 'bold');
   doc.text('Section Classification:', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -484,7 +511,9 @@ function drawStrainAnalysis(
   doc.text(`Strength Reduction Factor: phi = ${formatNumber(results.phi, 3)}`, MARGIN_LEFT, y);
   y += 12;
 
-  // Design moment capacity
+  // Design moment capacity (needs ~30mm)
+  y = checkPageBreak(doc, y, 30);
+  doc.setTextColor(...PRIMARY_COLOR);
   doc.setFont('helvetica', 'bold');
   doc.text('Design Moment Capacity, phi x Mn', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -518,7 +547,8 @@ function drawReinforcementLimits(
   doc.setTextColor(...PRIMARY_COLOR);
   doc.setFontSize(10);
 
-  // Minimum reinforcement
+  // Minimum reinforcement (needs ~35mm)
+  y = checkPageBreak(doc, y, 35);
   doc.setFont('helvetica', 'bold');
   doc.text('Minimum Reinforcement Ratio, rho_min', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -547,7 +577,9 @@ function drawReinforcementLimits(
 
   y += 26;
 
-  // Maximum reinforcement
+  // Maximum reinforcement (needs ~25mm)
+  y = checkPageBreak(doc, y, 25);
+  doc.setTextColor(...PRIMARY_COLOR);
   doc.setFont('helvetica', 'bold');
   doc.text('Maximum Reinforcement Ratio, rho_max', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
@@ -582,7 +614,9 @@ function drawReinforcementLimits(
 
   y += 12;
 
-  // Checks section title
+  // Checks section title (needs ~45mm for all checks)
+  y = checkPageBreak(doc, y, 45);
+  doc.setTextColor(...PRIMARY_COLOR);
   doc.setFont('helvetica', 'bold');
   doc.text('Code Compliance Checks:', MARGIN_LEFT, y);
   doc.setFont('helvetica', 'normal');
